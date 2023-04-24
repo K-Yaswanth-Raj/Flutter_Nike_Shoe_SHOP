@@ -1,12 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nike_shoe_shop/components/shoe_tile.dart';
+import 'package:nike_shoe_shop/models/cart.dart';
 import 'package:nike_shoe_shop/models/shoe.dart';
 
-class ShopPage extends StatelessWidget {
+class ShopPage extends ConsumerWidget {
   const ShopPage({super.key});
 
+  void addShoeToCart(Shoe shoe, WidgetRef ref,BuildContext context){
+    ref.read(cartProvider).addItemToCart(shoe);
+    showDialog(context: context, builder: (context) => AlertDialog(
+      title: Text('Added'),
+      content: Text('Check Cart!'),
+    ),);
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return SafeArea(
       child: Scaffold(
         backgroundColor: Colors.grey[300],
@@ -75,14 +85,10 @@ class ShopPage extends StatelessWidget {
                 scrollDirection: Axis.horizontal,
                 itemCount: 4,
                 itemBuilder: (BuildContext context, int index) {
-                  Shoe shoe = Shoe(
-                    name: 'Air',
-                    price: '240',
-                    imagePath: 'lib/images/1.png',
-                    description: 'Cool shoe',
-                  );
+                  Shoe shoe = ref.watch(cartProvider).getShoeList()[index];
                   return ShoeTile(
                     shoe: shoe,
+                    onTap: () => addShoeToCart(shoe,ref,context),
                   );
                 },
               ),
